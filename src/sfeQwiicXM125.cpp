@@ -406,173 +406,28 @@ int32_t QwDevXM125::getDistanceTemperature(uint32_t &temperature)
     return retVal;
 }
 
-int32_t QwDevXM125::getDistancePeak0Distance(uint32_t &peak)
+int32_t QwDevXM125::getDistancePeakDistance(uint8_t index, uint32_t &peak)
 {
+    if(index > (SFE_XM125_DISTANCE_PEAK9_DISTANCE - SFE_XM125_DISTANCE_PEAK0_DISTANCE)) {
+        return -1;
+    }
     size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK0_DISTANCE, (uint8_t*)&peak, 4, readBytes);
+    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK0_DISTANCE + index, (uint8_t*)&peak, 4, readBytes);
     peak = __builtin_bswap32(peak);
     return retVal;
 }
 
-int32_t QwDevXM125::getDistancePeak1Distance(uint32_t &peak)
+int32_t QwDevXM125::getDistancePeakStrength(uint8_t index, int32_t &peak)
 {
+    if(index > (SFE_XM125_DISTANCE_PEAK9_STRENGTH - SFE_XM125_DISTANCE_PEAK0_STRENGTH)) {
+        return -1;
+    }
     size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK1_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
+    uint32_t regVal;
 
-int32_t QwDevXM125::getDistancePeak2Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK2_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak3Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK3_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak4Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK4_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak5Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK5_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak6Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK6_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak7Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK7_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak8Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK8_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak9Distance(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK9_DISTANCE, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak0Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK0_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak1Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK1_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak2Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK2_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak3Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK3_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak4Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK4_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak5Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK5_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak6Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK6_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak7Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK7_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak8Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK8_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
-    return retVal;
-}
-
-int32_t QwDevXM125::getDistancePeak9Strength(uint32_t &peak)
-{
-    size_t readBytes = 0;
-    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK9_STRENGTH, (uint8_t*)&peak, 4, readBytes);
-    peak = __builtin_bswap32(peak);
-    peak = peak/1000;
+    int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PEAK0_STRENGTH + index, (uint8_t*)&regVal, 4, readBytes);
+    regVal = __builtin_bswap32(regVal);
+    peak = static_cast<int32_t>(regVal);
     return retVal;
 }
 
