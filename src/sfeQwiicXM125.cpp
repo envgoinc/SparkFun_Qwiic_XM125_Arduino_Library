@@ -47,6 +47,43 @@ int32_t QwDevXM125::begin(sfeTkII2C *theBus)
     return 0;
 }
 
+int32_t QwDevXM125::returnRegister(const uint16_t reg, uint32_t &regVal)
+{
+    int32_t retVal;
+
+    // Read from 16-Bit Register
+    size_t readBytes = 0;
+    retVal = _theBus->readRegister16Region(reg, (uint8_t*)&regVal, 4, readBytes);
+    regVal = __builtin_bswap32(regVal);
+
+    return retVal;
+}
+
+uint8_t QwDevXM125::decodeNumDistances(const uint32_t &result)
+{
+    return static_cast<uint8_t>(result & SFE_XM125_DISTANCE_NUMBER_DISTANCES_MASK);
+}
+
+bool QwDevXM125::decodeNearStartEdge(const uint32_t &result)
+{
+    return (result & SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK) != 0;
+}
+
+bool QwDevXM125::decodeCalibrationNeeded(const uint32_t &result)
+{
+    return (result & SFE_XM125_DISTANCE_CALIBRATION_NEEDED_MASK) != 0;
+}
+
+bool QwDevXM125::decodeMeasureDistanceError(const uint32_t &result)
+{
+    return (result &  SFE_XM125_DISTANCE_MEASURE_DISTANCE_ERROR_MASK) != 0;
+}
+
+uint16_t QwDevXM125::decodeTemperature(const uint32_t &result)
+{
+    return static_cast<int16_t>((result &  SFE_XM125_DISTANCE_TEMPERATURE_MASK) >> SFE_XM125_DISTANCE_TEMPERATURE_MASK_SHIFT);
+}
+
 // --------------------- I2C Disance Detector Functions ---------------------
 int32_t QwDevXM125::distanceBegin()
 {
@@ -316,7 +353,7 @@ int32_t QwDevXM125::getDistanceNearStartEdge(uint32_t &edge)
     regVal = __builtin_bswap32(regVal);
 
     // Mask unused bits from register
-    edge = (regVal &  SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK) >> SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK_SHIFT;
+    edge = (regVal & SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK) >> SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK_SHIFT;
 
     return retVal;
 }
@@ -793,6 +830,9 @@ int32_t QwDevXM125::distanceBusyWait()
     while(((regVal & SFE_XM125_DISTANCE_DETECTOR_STATUS_MASK) >> SFE_XM125_DISTANCE_DETECTOR_STATUS_MASK_SHIFT) != 0)
     {
         retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
+        if(retVal != 0) {
+            break;
+        }
         regVal = __builtin_bswap32(regVal);
     }
 

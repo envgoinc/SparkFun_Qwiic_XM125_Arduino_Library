@@ -13,9 +13,15 @@ class QwDevXM125
     /// @return Error code (0 no error)
     int32_t begin(sfeTkII2C *theBus = nullptr);
 
-    int32_t returnRegister(uint32_t &regVal);
+    int32_t returnRegister(const uint16_t reg, uint32_t &regVal);
 
     // --------------------- I2C Disance Detector Functions ---------------------
+
+    static uint8_t decodeNumDistances(const uint32_t &result);
+    static bool decodeNearStartEdge(const uint32_t &result);
+    static bool decodeCalibrationNeeded(const uint32_t &result);
+    static bool decodeMeasureDistanceError(const uint32_t &result);
+    static uint16_t decodeTemperature(const uint32_t &result);
 
     /// @brief This function sets all the beginning values for a basic I2C
     ///  example to be run on the device for presence sensing.
