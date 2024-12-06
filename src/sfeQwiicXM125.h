@@ -11,7 +11,7 @@ class QwDevXM125
 
     /// @brief This function begins the examples/communication.
     /// @return Error code (0 no error)
-    bool begin(sfeTkII2C *theBus = nullptr);
+    int32_t begin(sfeTkII2C *theBus = nullptr);
 
     int32_t returnRegister(uint32_t &regVal);
 

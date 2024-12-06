@@ -3,10 +3,10 @@
 
 QwDevXM125::QwDevXM125()
 {
-    // 
+    //
 }
 
-bool QwDevXM125::begin(sfeTkII2C *theBus)
+int32_t QwDevXM125::begin(sfeTkII2C *theBus)
 {
     if(theBus == nullptr)
     {
@@ -19,10 +19,10 @@ bool QwDevXM125::begin(sfeTkII2C *theBus)
         return kSTkErrFail;
     }
 
-    // Sets communication bus 
+    // Sets communication bus
     _theBus = theBus;
 
-    // Check errors from device 
+    // Check errors from device
     uint32_t distanceError = 0;
     uint32_t presenceError = 0;
     int32_t distFuncErr = 0;
@@ -59,7 +59,7 @@ int32_t QwDevXM125::distanceBegin()
 
     distanceBusyWait();
 
-    // Check error and busy bits 
+    // Check error and busy bits
     if(getDistanceDetectorErrorStatus(errorStatus) != 0)
     {
         return 1;
@@ -69,22 +69,22 @@ int32_t QwDevXM125::distanceBegin()
     {
         return 2;
     }
-  
-    // Set Start register 
+
+    // Set Start register
     if(setDistanceStart(sfe_xm125_distance_start_default) != 0)
     {
         return 3;
     }
-    delay(100);  // give time for command to set 
+    delay(100);  // give time for command to set
 
-    // Set End register 
+    // Set End register
     if(setDistanceEnd(sfe_xm125_distance_end_default) != 0)
     {
         return 4;
     }
-    delay(100);  // give time for command to set 
+    delay(100);  // give time for command to set
 
-    // Apply configuration 
+    // Apply configuration
     if(setDistanceCommand(SFE_XM125_DISTANCE_APPLY_CONFIGURATION) != 0)
     {
       // Check for errors
@@ -93,17 +93,17 @@ int32_t QwDevXM125::distanceBegin()
       {
         return 5;
       }
-  
+
       return 6;
     }
 
     // Poll detector status until busy bit is cleared
     if(distanceBusyWait() != 0)
     {
-        return 7; 
+        return 7;
     }
 
-    // Check detector status 
+    // Check detector status
     getDistanceDetectorErrorStatus(errorStatus);
     if(errorStatus != 0)
     {
@@ -120,27 +120,27 @@ int32_t QwDevXM125::distanceDetectorReadingSetup()
     uint32_t calibrateNeeded = 0;
     uint32_t measDistErr = 0;
 
-    // Check error bits 
+    // Check error bits
     getDistanceDetectorErrorStatus(errorStatus);
     if(errorStatus != 0)
     {
         return 1;
     }
-    
-    // Start detector 
+
+    // Start detector
     if(setDistanceCommand(SFE_XM125_DISTANCE_START_DETECTOR) != 0)
     {
         return 2;
     }
-    delay(100); // give time for command to set 
-    
+    delay(100); // give time for command to set
+
     // Poll detector status until busy bit is cleared - CHECK ON THIS!
     if(distanceBusyWait() != 0)
     {
         return 3;
     }
-    
-    // Verify that no error bits are set in the detector status register 
+
+    // Verify that no error bits are set in the detector status register
     getDistanceDetectorErrorStatus(errorStatus);
     if(errorStatus != 0)
     {
@@ -156,7 +156,7 @@ int32_t QwDevXM125::distanceDetectorReadingSetup()
     }
     delay(100);
 
-    // Recalibrate device if calibration error is triggered 
+    // Recalibrate device if calibration error is triggered
     getDistanceCalibrationNeeded(calibrateNeeded);
     if(calibrateNeeded == 1)
     {
@@ -178,7 +178,7 @@ int32_t QwDevXM125::getDistanceDetectorVersion(uint32_t &major, uint32_t &minor,
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_VERSION, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     major = (regVal & SFE_XM125_DISTANCE_MAJOR_VERSION_MASK) >> SFE_XM125_DISTANCE_MAJOR_VERSION_MASK_SHIFT;
     minor = (regVal & SFE_XM125_DISTANCE_MINOR_VERSION_MASK) >> SFE_XM125_DISTANCE_MINOR_VERSION_MASK_SHIFT;
     patch = regVal & SFE_XM125_DISTANCE_PATCH_VERSION_MASK;
@@ -188,7 +188,7 @@ int32_t QwDevXM125::getDistanceDetectorVersion(uint32_t &major, uint32_t &minor,
 
 int32_t QwDevXM125::getDistanceDetectorError(uint32_t &error)
 {
-    // Read from 16-Bit Register    
+    // Read from 16-Bit Register
     size_t readBytes = 0;
     int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_PROTOCOL_STATUS, (uint8_t*)&error, 4, readBytes);
     error = __builtin_bswap32(error);
@@ -269,7 +269,7 @@ int32_t QwDevXM125::getDistanceDetectorErrorStatus(uint32_t &status)
         return 0;
     }
 
-    return 0; // return 0  with no errors 
+    return 0; // return 0  with no errors
 }
 
 int32_t QwDevXM125::getDistanceMeasureCounter(uint32_t &counter)
@@ -299,7 +299,7 @@ int32_t QwDevXM125::getDistanceNumberDistances(uint32_t &distance)
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_RESULT, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     distance = (regVal & SFE_XM125_DISTANCE_NUMBER_DISTANCES_MASK);
 
     return retVal;
@@ -315,7 +315,7 @@ int32_t QwDevXM125::getDistanceNearStartEdge(uint32_t &edge)
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_RESULT, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     edge = (regVal &  SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK) >> SFE_XM125_DISTANCE_NEAR_START_EDGE_MASK_SHIFT;
 
     return retVal;
@@ -331,7 +331,7 @@ int32_t QwDevXM125::getDistanceCalibrationNeeded(uint32_t &calibrate)
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_RESULT, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     calibrate = (regVal & SFE_XM125_DISTANCE_CALIBRATION_NEEDED_MASK) >> SFE_XM125_DISTANCE_CALIBRATION_NEEDED_MASK_SHIFT;
 
     return retVal;
@@ -347,7 +347,7 @@ int32_t QwDevXM125::getDistanceMeasureDistanceError(uint32_t &error)
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_RESULT, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     error = (regVal &  SFE_XM125_DISTANCE_MEASURE_DISTANCE_ERROR_MASK) >> SFE_XM125_DISTANCE_MEASURE_DISTANCE_ERROR_MASK_SHIFT;
 
     return retVal;
@@ -363,7 +363,7 @@ int32_t QwDevXM125::getDistanceTemperature(uint32_t &temperature)
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_RESULT, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     temperature = (regVal &  SFE_XM125_DISTANCE_TEMPERATURE_MASK) >> SFE_XM125_DISTANCE_TEMPERATURE_MASK_SHIFT;
 
     return retVal;
@@ -789,7 +789,7 @@ int32_t QwDevXM125::distanceBusyWait()
     retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Poll Detector Status until Busy bit is cleared 
+    // Poll Detector Status until Busy bit is cleared
     while(((regVal & SFE_XM125_DISTANCE_DETECTOR_STATUS_MASK) >> SFE_XM125_DISTANCE_DETECTOR_STATUS_MASK_SHIFT) != 0)
     {
         retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
@@ -816,9 +816,9 @@ int32_t QwDevXM125::presenceDetectorStart()
     {
         return 1;
     }
-    delay(100); // give time for command to set 
+    delay(100); // give time for command to set
 
-    // Check detector status error and busy bits 
+    // Check detector status error and busy bits
     if(getPresenceDetectorErrorStatus(errorStatus) != 0)
     {
         return 2;
@@ -827,22 +827,22 @@ int32_t QwDevXM125::presenceDetectorStart()
     {
         return 3;
     }
-  
-    // Set Presence Start register 
+
+    // Set Presence Start register
     if(setPresenceStart(300) != 0)
     {
         return 4;
     }
-    delay(100); // give time for command to set 
+    delay(100); // give time for command to set
 
-    // Set End register 
+    // Set End register
     if(setPresenceEnd(2500) != 0)
     {
         return 5;
     }
-    delay(100); // give time for command to set 
+    delay(100); // give time for command to set
 
-    // Apply configuration 
+    // Apply configuration
     if(setPresenceCommand(SFE_XM125_PRESENCE_APPLY_CONFIGURATION) != 0)
     {
       // Check for errors
@@ -851,10 +851,10 @@ int32_t QwDevXM125::presenceDetectorStart()
       {
         return 6;
       }
-  
+
       return 7;
     }
-    delay(100); // give time for command to set 
+    delay(100); // give time for command to set
 
     // Poll detector status until busy bit is cleared
     if(presenceBusyWait() != 0)
@@ -862,7 +862,7 @@ int32_t QwDevXM125::presenceDetectorStart()
       return 8;
     }
 
-    // Check detector error status 
+    // Check detector error status
     getPresenceDetectorErrorStatus(errorStatus);
     if(errorStatus != 0)
     {
@@ -875,31 +875,31 @@ int32_t QwDevXM125::presenceDetectorStart()
 
 int32_t QwDevXM125::getPresenceDistanceValuemm(uint32_t &presenceVal)
 {
-    // Check error bits 
+    // Check error bits
     uint32_t errorStatus = 0;
     uint32_t presenceDetected = 0;
-    uint32_t presenceDetectedSticky = 0; 
+    uint32_t presenceDetectedSticky = 0;
 
     getPresenceDetectorErrorStatus(errorStatus);
     if(errorStatus != 0)
     {
         return 1;
     }
-    
-    // Start detector 
+
+    // Start detector
     if(setPresenceCommand(SFE_XM125_PRESENCE_START_DETECTOR) != 0)
     {
         return 2;
     }
     delay(100);
-    
+
     // Poll detector status until busy bit is cleared - CHECK ON THIS!
     if(presenceBusyWait() != 0)
     {
         return 3;
     }
-    
-    // Verify that no error bits are set in the detector status register 
+
+    // Verify that no error bits are set in the detector status register
     getPresenceDetectorErrorStatus(errorStatus);
     if(errorStatus != 0)
     {
@@ -909,7 +909,7 @@ int32_t QwDevXM125::getPresenceDistanceValuemm(uint32_t &presenceVal)
     // Read detector result register and determine detection status
     getPresenceDetectorPresenceDetected(presenceDetected);
     getPresenceDetectorPresenceStickyDetected(presenceDetectedSticky);
-    
+
     if((presenceDetected == 1) | (presenceDetectedSticky == 1))
     {
         getPresenceDistance(presenceVal);
@@ -926,7 +926,7 @@ int32_t QwDevXM125::getPresenceDetectorVersion(uint32_t &major, uint32_t &minor,
     size_t readBytes = 0;
     retVal = _theBus->readRegister16Region(SFE_XM125_PRESENCE_VERSION, (uint8_t*)&regVal, 4, readBytes);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     major = (regVal & SFE_XM125_PRESENCE_MAJOR_VERSION_MASK) >> SFE_XM125_PRESENCE_MAJOR_VERSION_MASK_SHIFT;
     minor = (regVal & SFE_XM125_PRESENCE_MINOR_VERSION_MASK) >> SFE_XM125_PRESENCE_MINOR_VERSION_MASK_SHIFT;
     patch = regVal & SFE_XM125_PRESENCE_PATCH_VERSION_MASK;
@@ -1012,7 +1012,7 @@ int32_t QwDevXM125::getPresenceDetectorErrorStatus(uint32_t &status)
     }
 
     // return 0 with no errors
-    return 0;  
+    return 0;
 }
 
 
@@ -1026,7 +1026,7 @@ int32_t QwDevXM125::getPresenceDetectorPresenceDetected(uint32_t &detected)
 
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     detected = (regVal & SFE_XM125_PRESENCE_DETECTED_MASK);
 
     return retVal;
@@ -1042,7 +1042,7 @@ int32_t QwDevXM125::getPresenceDetectorPresenceStickyDetected(uint32_t &sticky)
 
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     sticky = (regVal & SFE_XM125_PRESENCE_DETECTED_STICKY_MASK) >> 1;
 
     return retVal;
@@ -1058,7 +1058,7 @@ int32_t QwDevXM125::getPresenceDetectorRegError(uint32_t &error)
 
     regVal = __builtin_bswap32(regVal);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     error = (regVal & SFE_XM125_PRESENCE_DETECTOR_ERROR_MASK) >> SFE_XM125_PRESENCE_DETECTOR_ERROR_MASK_SHIFT;
 
     return retVal;
@@ -1072,7 +1072,7 @@ int32_t QwDevXM125::getPresenceTemperature(uint32_t &temp)
     size_t readBytes = 0;
     int32_t retVal = _theBus->readRegister16Region(SFE_XM125_PRESENCE_DISTANCE, (uint8_t*)&regVal, 4, readBytes);
 
-    // Mask unused bits from register 
+    // Mask unused bits from register
     temp = (regVal & SFE_XM125_PRESENCE_TEMPERATURE_MASK) >> SFE_XM125_PRESENCE_TEMPERATURE_MASK_SHIFT;
 
     return retVal;
@@ -1436,7 +1436,7 @@ int32_t QwDevXM125::getPresenceBusy(uint32_t &busy)
     retVal = _theBus->readRegister16Region(SFE_XM125_PRESENCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
 
     busy = __builtin_bswap32(busy);
-    // Mask unused bits from register 
+    // Mask unused bits from register
     busy = (regVal & SFE_XM125_PRESENCE_BUSY_MASK) >> SFE_XM125_PRESENCE_BUSY_MASK_SHIFT;
 
     return retVal;
@@ -1451,7 +1451,7 @@ int32_t QwDevXM125::presenceBusyWait()
     retVal = _theBus->readRegister16Region(SFE_XM125_PRESENCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
     regVal = __builtin_bswap32(regVal);
 
-    // Poll Detector Status until Busy bit is cleared 
+    // Poll Detector Status until Busy bit is cleared
     while(((regVal & SFE_XM125_PRESENCE_BUSY_MASK) >> 30) != 0)
     {
         retVal = _theBus->readRegister16Region(SFE_XM125_PRESENCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
