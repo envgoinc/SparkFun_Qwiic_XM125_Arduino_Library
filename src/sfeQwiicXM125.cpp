@@ -484,7 +484,7 @@ int32_t QwDevXM125::setDistanceCloseRangeLeakageCancellation(bool range)
     return _theBus->writeRegister16Region(SFE_XM125_DISTANCE_CLOSE_RANGE_LEAKAGE, (uint8_t*)&range, 4);
 }
 
-int32_t QwDevXM125::getDistanceSignalQuality(uint32_t &signal)
+int32_t QwDevXM125::getDistanceSignalQuality(int32_t &signal)
 {
     size_t readBytes = 0;
     int32_t retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_SIGNAL_QUALITY, (uint8_t*)&signal, 4, readBytes);
@@ -492,7 +492,7 @@ int32_t QwDevXM125::getDistanceSignalQuality(uint32_t &signal)
     return retVal;
 }
 
-int32_t QwDevXM125::setDistanceSignalQuality(uint32_t signal)
+int32_t QwDevXM125::setDistanceSignalQuality(int32_t signal)
 {
     signal = __builtin_bswap32(signal);
     return _theBus->writeRegister16Region(SFE_XM125_DISTANCE_SIGNAL_QUALITY, (uint8_t*)&signal, 4);

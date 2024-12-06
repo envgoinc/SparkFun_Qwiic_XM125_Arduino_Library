@@ -156,14 +156,14 @@ class QwDevXM125
     ///  Note: This value is a factor 1000 larger than the RSS value
     ///  Default Value: 15000
     /// @return Error code (0 no error)
-    int32_t getDistanceSignalQuality(uint32_t &signal);
+    int32_t getDistanceSignalQuality(int32_t &signal);
 
     /// @brief This function sets the high signal quality in a
     ///  better SNR (because of higher HWAAS) and higher power consumption.
     ///  Note: This value is a factor 1000 larger than the RSS value
     ///  Default Value: 15000
     /// @return Error code (0 no error)
-    int32_t setDistanceSignalQuality(uint32_t signal);
+    int32_t setDistanceSignalQuality(int32_t signal);
 
     /// @brief This function returns the max profile of the device.
     ///  Default value = PROFILE5
