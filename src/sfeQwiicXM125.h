@@ -328,7 +328,7 @@ class QwDevXM125
     /// @brief Completes a busy wait loop while the device is uploading
     ///  information by waiting for the status
     /// @return Error code (0 no error)
-    int32_t distanceBusyWait();
+    int32_t distanceBusyWait(uint32_t timeout = 0);
 
     // --------------------- I2C Presence Detector Functions ---------------------
 

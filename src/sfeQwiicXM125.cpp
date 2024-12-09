@@ -672,31 +672,40 @@ int32_t QwDevXM125::distanceReset()
     return setDistanceCommand(SFE_XM125_DISTANCE_RESET_MODULE);
 }
 
-int32_t QwDevXM125::distanceBusyWait()
+int32_t QwDevXM125::distanceBusyWait(uint32_t timeout)
 {
     int32_t retVal = 0;
     uint32_t regVal = 0;
-
     size_t readBytes = 0;
-    retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
-    regVal = __builtin_bswap32(regVal);
+    const uint32_t start = millis();
 
-    // Poll Detector Status until Busy bit is cleared
-    while(((regVal & SFE_XM125_DISTANCE_DETECTOR_STATUS_MASK) >> SFE_XM125_DISTANCE_DETECTOR_STATUS_MASK_SHIFT) != 0)
-    {
+    do {
         retVal = _theBus->readRegister16Region(SFE_XM125_DISTANCE_DETECTOR_STATUS, (uint8_t*)&regVal, 4, readBytes);
         if(retVal != 0) {
             break;
         }
         regVal = __builtin_bswap32(regVal);
-    }
+
+        if((timeout != 0) && ((millis() - start) > timeout)) {
+            break;
+        }
+        // Poll Detector Status until Busy bit is cleared
+    } while((regVal & SFE_XM125_DISTANCE_BUSY_MASK) != 0);
+
 
     // Return error code if non-zero
     if(retVal != 0)
     {
         return retVal;
     }
-    return 0; // 0 on success
+    else if ((regVal & SFE_XM125_DISTANCE_BUSY_MASK) != 0)
+    {
+        return -2;
+    }
+    else
+    {
+        return 0; // 0 on success
+    }
 }
 
 // --------------------- I2C Presence Detector Functions ---------------------
