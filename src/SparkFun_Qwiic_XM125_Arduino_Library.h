@@ -1,10 +1,11 @@
 #include "sfeQwiicXM125.h"
 #include <Arduino.h>
 #include <Wire.h>
+#include <SparkFun_Toolkit.h>
 
 class SfeXM125 : public QwDevXM125
 {
-    public: 
+    public:
 
         SfeXM125()
         {
@@ -23,8 +24,8 @@ class SfeXM125 : public QwDevXM125
             return this->QwDevXM125::begin(&_i2cBus) == 0;
         }
 
-    private: 
-        
+    private:
+
         // I2C bus class
         sfeTkArdI2C _i2cBus;
         //QwDevXM125::QwI2C _i2cBus; // original code

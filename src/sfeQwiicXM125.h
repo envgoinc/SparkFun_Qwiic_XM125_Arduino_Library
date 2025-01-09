@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SparkFun_Toolkit.h"
+#include <SparkFun_Toolkit/src/sfeTk/sfeTkII2C.h>
 #include "sfeXM125Regs.h"
 
 class QwDevXM125
